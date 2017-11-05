@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -111,5 +111,154 @@ namespace Interceptor
         NumpadEnter = 28,
         NumpadPlus = 78,
         NumpadMinus = 74,
+    }
+
+    public class KeyConvert{
+        /// <summary>
+        /// Converts a character to a Keys enum and a 'do we need to press shift'.
+        /// </summary>
+        public static Tuple<Keys, bool> CharacterToKeysEnum(char c)
+        {
+            switch (Char.ToLower(c))
+            {
+                case 'a':
+                    return new Tuple<Keys, bool>(Keys.A, false);
+                case 'b':
+                    return new Tuple<Keys, bool>(Keys.B, false);
+                case 'c':
+                    return new Tuple<Keys, bool>(Keys.C, false);
+                case 'd':
+                    return new Tuple<Keys, bool>(Keys.D, false);
+                case 'e':
+                    return new Tuple<Keys, bool>(Keys.E, false);
+                case 'f':
+                    return new Tuple<Keys, bool>(Keys.F, false);
+                case 'g':
+                    return new Tuple<Keys, bool>(Keys.G, false);
+                case 'h':
+                    return new Tuple<Keys, bool>(Keys.H, false);
+                case 'i':
+                    return new Tuple<Keys, bool>(Keys.I, false);
+                case 'j':
+                    return new Tuple<Keys, bool>(Keys.J, false);
+                case 'k':
+                    return new Tuple<Keys, bool>(Keys.K, false);
+                case 'l':
+                    return new Tuple<Keys, bool>(Keys.L, false);
+                case 'm':
+                    return new Tuple<Keys, bool>(Keys.M, false);
+                case 'n':
+                    return new Tuple<Keys, bool>(Keys.N, false);
+                case 'o':
+                    return new Tuple<Keys, bool>(Keys.O, false);
+                case 'p':
+                    return new Tuple<Keys, bool>(Keys.P, false);
+                case 'q':
+                    return new Tuple<Keys, bool>(Keys.Q, false);
+                case 'r':
+                    return new Tuple<Keys, bool>(Keys.R, false);
+                case 's':
+                    return new Tuple<Keys, bool>(Keys.S, false);
+                case 't':
+                    return new Tuple<Keys, bool>(Keys.T, false);
+                case 'u':
+                    return new Tuple<Keys, bool>(Keys.U, false);
+                case 'v':
+                    return new Tuple<Keys, bool>(Keys.V, false);
+                case 'w':
+                    return new Tuple<Keys, bool>(Keys.W, false);
+                case 'x':
+                    return new Tuple<Keys, bool>(Keys.X, false);
+                case 'y':
+                    return new Tuple<Keys, bool>(Keys.Y, false);
+                case 'z':
+                    return new Tuple<Keys, bool>(Keys.Z, false);
+                case '1':
+                    return new Tuple<Keys, bool>(Keys.One, false);
+                case '2':
+                    return new Tuple<Keys, bool>(Keys.Two, false);
+                case '3':
+                    return new Tuple<Keys, bool>(Keys.Three, false);
+                case '4':
+                    return new Tuple<Keys, bool>(Keys.Four, false);
+                case '5':
+                    return new Tuple<Keys, bool>(Keys.Five, false);
+                case '6':
+                    return new Tuple<Keys, bool>(Keys.Six, false);
+                case '7':
+                    return new Tuple<Keys, bool>(Keys.Seven, false);
+                case '8':
+                    return new Tuple<Keys, bool>(Keys.Eight, false);
+                case '9':
+                    return new Tuple<Keys, bool>(Keys.Nine, false);
+                case '0':
+                    return new Tuple<Keys, bool>(Keys.Zero, false);
+                case '-':
+                    return new Tuple<Keys, bool>(Keys.DashUnderscore, false);
+                case '+':
+                    return new Tuple<Keys, bool>(Keys.PlusEquals, false);
+                case '[':
+                    return new Tuple<Keys, bool>(Keys.OpenBracketBrace, false);
+                case ']':
+                    return new Tuple<Keys, bool>(Keys.CloseBracketBrace, false);
+                case ';':
+                    return new Tuple<Keys, bool>(Keys.SemicolonColon, false);
+                case '\'':
+                    return new Tuple<Keys, bool>(Keys.SingleDoubleQuote, false);
+                case ',':
+                    return new Tuple<Keys, bool>(Keys.CommaLeftArrow, false);
+                case '.':
+                    return new Tuple<Keys, bool>(Keys.PeriodRightArrow, false);
+                case '/':
+                    return new Tuple<Keys, bool>(Keys.ForwardSlashQuestionMark, false);
+                case '{':
+                    return new Tuple<Keys, bool>(Keys.OpenBracketBrace, true);
+                case '}':
+                    return new Tuple<Keys, bool>(Keys.CloseBracketBrace, true);
+                case ':':
+                    return new Tuple<Keys, bool>(Keys.SemicolonColon, true);
+                case '\"':
+                    return new Tuple<Keys, bool>(Keys.SingleDoubleQuote, true);
+                case '<':
+                    return new Tuple<Keys, bool>(Keys.CommaLeftArrow, true);
+                case '>':
+                    return new Tuple<Keys, bool>(Keys.PeriodRightArrow, true);
+                case '?':
+                    return new Tuple<Keys, bool>(Keys.ForwardSlashQuestionMark, true);
+                case '\\':
+                    return new Tuple<Keys, bool>(Keys.BackslashPipe, false);
+                case '|':
+                    return new Tuple<Keys, bool>(Keys.BackslashPipe, true);
+                case '`':
+                    return new Tuple<Keys, bool>(Keys.Tilde, false);
+                case '~':
+                    return new Tuple<Keys, bool>(Keys.Tilde, true);
+                case '!':
+                    return new Tuple<Keys, bool>(Keys.One, true);
+                case '@':
+                    return new Tuple<Keys, bool>(Keys.Two, true);
+                case '#':
+                    return new Tuple<Keys, bool>(Keys.Three, true);
+                case '$':
+                    return new Tuple<Keys, bool>(Keys.Four, true);
+                case '%':
+                    return new Tuple<Keys, bool>(Keys.Five, true);
+                case '^':
+                    return new Tuple<Keys, bool>(Keys.Six, true);
+                case '&':
+                    return new Tuple<Keys, bool>(Keys.Seven, true);
+                case '*':
+                    return new Tuple<Keys, bool>(Keys.Eight, true);
+                case '(':
+                    return new Tuple<Keys, bool>(Keys.Nine, true);
+                case ')':
+                    return new Tuple<Keys, bool>(Keys.Zero, true);
+                case ' ':
+                    return new Tuple<Keys, bool>(Keys.Space, true);
+                default:
+                    return new Tuple<Keys, bool>(Keys.ForwardSlashQuestionMark, true);
+            }
+        }
+
     }
 }
