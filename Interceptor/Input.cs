@@ -1,4 +1,5 @@
-﻿using System;
+using Micsun.Common;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace Interceptor
 {
     public class Input
     {
+        private const String TAG = "Input";
         private IntPtr context;
         private Thread callbackThread;
 
@@ -40,7 +42,8 @@ namespace Interceptor
         public event EventHandler<KeyPressedEventArgs> OnKeyPressed;
         public event EventHandler<MousePressedEventArgs> OnMousePressed;
 
-        private int deviceId; /* Very important; which device the driver sends events to */
+        private int keyboardDeviceId=-1; /* Very important; which device the driver sends events to */
+        private int mouseDeviceId=-1;
 
         public Input()
         {
@@ -103,13 +106,15 @@ namespace Interceptor
             InterceptionDriver.SetFilter(context, InterceptionDriver.IsMouse, (Int32) MouseFilterMode);
 
             Stroke stroke = new Stroke();
-
+            int deviceId = 0;
             while (InterceptionDriver.Receive(context, deviceId = InterceptionDriver.Wait(context), ref stroke, 1) > 0)
             {
                 if (InterceptionDriver.IsMouse(deviceId) > 0)
                 {
+                    mouseDeviceId = deviceId;
                     if (OnMousePressed != null)
                     {
+                        Log.Debug(TAG, "Mouse Device Detected:[" + deviceId + "] x:" + stroke.Mouse.X + ",y:" + stroke.Mouse.Y + " tag:" + stroke.Mouse.Flags + " state:" + stroke.Mouse.State);
                         var args = new MousePressedEventArgs() { X = stroke.Mouse.X, Y = stroke.Mouse.Y, State = stroke.Mouse.State, Rolling = stroke.Mouse.Rolling };
                         OnMousePressed(this, args);
 
@@ -121,13 +126,16 @@ namespace Interceptor
                         stroke.Mouse.Y = args.Y;
                         stroke.Mouse.State = args.State;
                         stroke.Mouse.Rolling = args.Rolling;
+
                     }
                 }
 
                 if (InterceptionDriver.IsKeyboard(deviceId) > 0)
                 {
+                    keyboardDeviceId = deviceId;
                     if (OnKeyPressed != null)
                     {
+                        Log.Debug(TAG, "Keyboard Device Detected:[" + deviceId + "]");
                         var args = new KeyPressedEventArgs() { Key = stroke.Key.Code, State = stroke.Key.State};
                         OnKeyPressed(this, args);
 
@@ -157,7 +165,7 @@ namespace Interceptor
 
             stroke.Key = keyStroke;
 
-            InterceptionDriver.Send(context, deviceId, ref stroke, 1);
+            InterceptionDriver.Send(context, keyboardDeviceId, ref stroke, 1);
 
             if (KeyPressDelay > 0)
                 Thread.Sleep(KeyPressDelay);
@@ -192,7 +200,7 @@ namespace Interceptor
         {
             foreach (char letter in text)
             {
-                var tuple = CharacterToKeysEnum(letter);
+                var tuple = KeyConvert.CharacterToKeysEnum(letter);
 
                 if (tuple.Item2 == true) // We need to press shift to get the next character
                     SendKey(Keys.LeftShift, KeyState.Down);
@@ -204,153 +212,12 @@ namespace Interceptor
             }
         }
 
+ 
         /// <summary>
-        /// Converts a character to a Keys enum and a 'do we need to press shift'.
+        /// 
         /// </summary>
-        private Tuple<Keys, bool> CharacterToKeysEnum(char c)
-        {
-            switch (Char.ToLower(c))
-            {
-                case 'a':
-                    return new Tuple<Keys,bool>(Keys.A, false);
-                case 'b':
-                    return new Tuple<Keys,bool>(Keys.B, false);
-                case 'c':
-                    return new Tuple<Keys,bool>(Keys.C, false);
-                case 'd':
-                    return new Tuple<Keys,bool>(Keys.D, false);
-                case 'e':
-                    return new Tuple<Keys,bool>(Keys.E, false);
-                case 'f':
-                    return new Tuple<Keys,bool>(Keys.F, false);
-                case 'g':
-                    return new Tuple<Keys,bool>(Keys.G, false);
-                case 'h':
-                    return new Tuple<Keys,bool>(Keys.H, false);
-                case 'i':
-                    return new Tuple<Keys,bool>(Keys.I, false);
-                case 'j':
-                    return new Tuple<Keys,bool>(Keys.J, false);
-                case 'k':
-                    return new Tuple<Keys,bool>(Keys.K, false);
-                case 'l':
-                    return new Tuple<Keys,bool>(Keys.L, false);
-                case 'm':
-                    return new Tuple<Keys,bool>(Keys.M, false);
-                case 'n':
-                    return new Tuple<Keys,bool>(Keys.N, false);
-                case 'o':
-                    return new Tuple<Keys,bool>(Keys.O, false);
-                case 'p':
-                    return new Tuple<Keys,bool>(Keys.P, false);
-                case 'q':
-                    return new Tuple<Keys,bool>(Keys.Q, false);
-                case 'r':
-                    return new Tuple<Keys,bool>(Keys.R, false);
-                case 's':
-                    return new Tuple<Keys,bool>(Keys.S, false);
-                case 't':
-                    return new Tuple<Keys,bool>(Keys.T, false);
-                case 'u':
-                    return new Tuple<Keys,bool>(Keys.U, false);
-                case 'v':
-                    return new Tuple<Keys,bool>(Keys.V, false);
-                case 'w':
-                    return new Tuple<Keys,bool>(Keys.W, false);
-                case 'x':
-                    return new Tuple<Keys,bool>(Keys.X, false);
-                case 'y':
-                    return new Tuple<Keys,bool>(Keys.Y, false);
-                case 'z':
-                    return new Tuple<Keys,bool>(Keys.Z, false);
-                case '1':
-                    return new Tuple<Keys,bool>(Keys.One, false);
-                case '2':
-                    return new Tuple<Keys,bool>(Keys.Two, false);
-                case '3':
-                    return new Tuple<Keys,bool>(Keys.Three, false);
-                case '4':
-                    return new Tuple<Keys,bool>(Keys.Four, false);
-                case '5':
-                    return new Tuple<Keys,bool>(Keys.Five, false);
-                case '6':
-                    return new Tuple<Keys,bool>(Keys.Six, false);
-                case '7':
-                    return new Tuple<Keys,bool>(Keys.Seven, false);
-                case '8':
-                    return new Tuple<Keys,bool>(Keys.Eight, false);
-                case '9':
-                    return new Tuple<Keys,bool>(Keys.Nine, false);
-                case '0':
-                    return new Tuple<Keys,bool>(Keys.Zero, false);
-                case '-':
-                    return new Tuple<Keys,bool>(Keys.DashUnderscore, false);
-                case '+':
-                    return new Tuple<Keys,bool>(Keys.PlusEquals, false);
-                case '[':
-                    return new Tuple<Keys,bool>(Keys.OpenBracketBrace, false);
-                case ']':
-                    return new Tuple<Keys,bool>(Keys.CloseBracketBrace, false);
-                case ';':
-                    return new Tuple<Keys,bool>(Keys.SemicolonColon, false);
-                case '\'':
-                    return new Tuple<Keys,bool>(Keys.SingleDoubleQuote, false);
-                case ',':
-                    return new Tuple<Keys,bool>(Keys.CommaLeftArrow, false);
-                case '.':
-                    return new Tuple<Keys,bool>(Keys.PeriodRightArrow, false);
-                case '/':
-                    return new Tuple<Keys,bool>(Keys.ForwardSlashQuestionMark, false);
-                case '{':
-                    return new Tuple<Keys,bool>(Keys.OpenBracketBrace, true);
-                case '}':
-                    return new Tuple<Keys,bool>(Keys.CloseBracketBrace, true);
-                case ':':
-                    return new Tuple<Keys,bool>(Keys.SemicolonColon, true);
-                case '\"':
-                    return new Tuple<Keys,bool>(Keys.SingleDoubleQuote, true);
-                case '<':
-                    return new Tuple<Keys,bool>(Keys.CommaLeftArrow, true);
-                case '>':
-                    return new Tuple<Keys,bool>(Keys.PeriodRightArrow, true);
-                case '?':
-                    return new Tuple<Keys,bool>(Keys.ForwardSlashQuestionMark, true);
-                case '\\':
-                    return new Tuple<Keys,bool>(Keys.BackslashPipe, false);
-                case '|':
-                    return new Tuple<Keys,bool>(Keys.BackslashPipe, true);
-                case '`':
-                    return new Tuple<Keys,bool>(Keys.Tilde, false);
-                case '~':
-                    return new Tuple<Keys,bool>(Keys.Tilde, true);
-                case '!':
-                    return new Tuple<Keys,bool>(Keys.One, true);
-                case '@':
-                    return new Tuple<Keys,bool>(Keys.Two, true);
-                case '#':
-                    return new Tuple<Keys,bool>(Keys.Three, true);
-                case '$':
-                    return new Tuple<Keys,bool>(Keys.Four, true);
-                case '%':
-                    return new Tuple<Keys,bool>(Keys.Five, true);
-                case '^':
-                    return new Tuple<Keys,bool>(Keys.Six, true);
-                case '&':
-                    return new Tuple<Keys,bool>(Keys.Seven, true);
-                case '*':
-                    return new Tuple<Keys,bool>(Keys.Eight, true);
-                case '(':
-                    return new Tuple<Keys,bool>(Keys.Nine, true);
-                case ')':
-                    return new Tuple<Keys, bool>(Keys.Zero, true);
-                case ' ':
-                    return new Tuple<Keys, bool>(Keys.Space, true);
-                default:
-                    return new Tuple<Keys, bool>(Keys.ForwardSlashQuestionMark, true);
-            }
-        }
-
-        public void SendMouseEvent(MouseState state)
+        /// <param name="state"></param>
+        public void SendMouseEvent(int x,int y,MouseState state)
         {
             Stroke stroke = new Stroke();
             MouseStroke mouseStroke = new MouseStroke();
@@ -368,9 +235,55 @@ namespace Interceptor
 
             stroke.Mouse = mouseStroke;
 
-            InterceptionDriver.Send(context, 12, ref stroke, 1);
+            Point point = ConvertDevicePoint(x, y);
+
+            stroke.Mouse.X = point.X;
+            stroke.Mouse.Y = point.Y;
+            stroke.Mouse.Flags = MouseFlags.MoveAbsolute;
+
+            InterceptionDriver.Send(context, mouseDeviceId, ref stroke, 1);
         }
 
+        /// <summary>
+        /// Change Screen location to Device location
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        private static Point ConvertDevicePoint(int x,int y)
+        {
+            int SH = Screen.PrimaryScreen.Bounds.Height;
+            int SW = Screen.PrimaryScreen.Bounds.Width;
+            return new Point(0xFFFF * x / SW, 0xFFFF * y / SH);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="state"></param>
+        public void SendMouseEvent( MouseState state)
+        {
+            Stroke stroke = new Stroke();
+            MouseStroke mouseStroke = new MouseStroke();
+
+            mouseStroke.State = state;
+
+            if (state == MouseState.ScrollUp)
+            {
+                mouseStroke.Rolling = 120;
+            }
+            else if (state == MouseState.ScrollDown)
+            {
+                mouseStroke.Rolling = -120;
+            }
+
+            stroke.Mouse = mouseStroke;
+            InterceptionDriver.Send(context, mouseDeviceId, ref stroke, 1);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public void SendLeftClick()
         {
             SendMouseEvent(MouseState.LeftDown);
@@ -378,6 +291,9 @@ namespace Interceptor
             SendMouseEvent(MouseState.LeftUp);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void SendRightClick()
         {
             SendMouseEvent(MouseState.RightDown);
@@ -385,6 +301,10 @@ namespace Interceptor
             SendMouseEvent(MouseState.RightUp);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="direction"></param>
         public void ScrollMouse(ScrollDirection direction)
         {
             switch (direction)
@@ -400,7 +320,6 @@ namespace Interceptor
 
         /// <summary>
         /// Warning: This function, if using the driver, does not function reliably and often moves the mouse in unpredictable vectors. An alternate version uses the standard Win32 API to get the current cursor's position, calculates the desired destination's offset, and uses the Win32 API to set the cursor to the new position.
-        /// The function is working right now
         /// </summary>
         public void MoveMouseBy(int deltaX, int deltaY, bool useDriver = false)
         {
@@ -409,15 +328,15 @@ namespace Interceptor
                 Stroke stroke = new Stroke();
                 MouseStroke mouseStroke = new MouseStroke();
 
-                Point point = ConvertDevicePoint(deltaX,deltaY);
-                
+                Point point = ConvertDevicePoint(deltaX, deltaY);
+
                 mouseStroke.X = point.X;
                 mouseStroke.Y = point.Y;
-                
+
                 stroke.Mouse = mouseStroke;
                 stroke.Mouse.Flags = MouseFlags.MoveRelative;
 
-                InterceptionDriver.Send(context, 12, ref stroke, 1);
+                InterceptionDriver.Send(context, mouseDeviceId, ref stroke, 1);
             }
             else
             {
@@ -428,7 +347,6 @@ namespace Interceptor
 
         /// <summary>
         /// Warning: This function, if using the driver, does not function reliably and often moves the mouse in unpredictable vectors. An alternate version uses the standard Win32 API to set the cursor's position and does not use the driver.
-        /// The function is working right now
         /// </summary>
         public void MoveMouseTo(int x, int y, bool useDriver = false)
         {
@@ -437,33 +355,20 @@ namespace Interceptor
                 Stroke stroke = new Stroke();
                 MouseStroke mouseStroke = new MouseStroke();
 
-                Point point = ConvertDevicePoint(x,y);
-                
+                Point point = ConvertDevicePoint(x, y);
+
                 mouseStroke.X = point.X;
                 mouseStroke.Y = point.Y;
+                mouseStroke.State = 0;
 
                 stroke.Mouse = mouseStroke;
                 stroke.Mouse.Flags = MouseFlags.MoveAbsolute;
-
-                InterceptionDriver.Send(context, 12, ref stroke, 1);
+                InterceptionDriver.Send(context, mouseDeviceId, ref stroke, 1);
             }
             else
             {
                 Cursor.Position = new Point(x, y);
             }
-        }
-        
-        /// <summary>
-        /// Change Screen location to Device location
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        private static Point ConvertDevicePoint(int x,int y)
-        {
-            int SH = Screen.PrimaryScreen.Bounds.Height;
-            int SW = Screen.PrimaryScreen.Bounds.Width;
-            return new Point(0xFFFF * x / SW, 0xFFFF * y / SH);
         }
     }
 }
