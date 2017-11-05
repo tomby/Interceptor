@@ -400,6 +400,7 @@ namespace Interceptor
 
         /// <summary>
         /// Warning: This function, if using the driver, does not function reliably and often moves the mouse in unpredictable vectors. An alternate version uses the standard Win32 API to get the current cursor's position, calculates the desired destination's offset, and uses the Win32 API to set the cursor to the new position.
+        /// The function is working right now
         /// </summary>
         public void MoveMouseBy(int deltaX, int deltaY, bool useDriver = false)
         {
@@ -408,9 +409,11 @@ namespace Interceptor
                 Stroke stroke = new Stroke();
                 MouseStroke mouseStroke = new MouseStroke();
 
-                mouseStroke.X = deltaX;
-                mouseStroke.Y = deltaY;
-
+                Point point = ConvertDevicePoint(deltaX,deltaY);
+                
+                mouseStroke.X = point.X;
+                mouseStroke.Y = point.Y;
+                
                 stroke.Mouse = mouseStroke;
                 stroke.Mouse.Flags = MouseFlags.MoveRelative;
 
@@ -425,6 +428,7 @@ namespace Interceptor
 
         /// <summary>
         /// Warning: This function, if using the driver, does not function reliably and often moves the mouse in unpredictable vectors. An alternate version uses the standard Win32 API to set the cursor's position and does not use the driver.
+        /// The function is working right now
         /// </summary>
         public void MoveMouseTo(int x, int y, bool useDriver = false)
         {
@@ -433,17 +437,33 @@ namespace Interceptor
                 Stroke stroke = new Stroke();
                 MouseStroke mouseStroke = new MouseStroke();
 
-                mouseStroke.X = x;
-                mouseStroke.Y = y;
+                Point point = ConvertDevicePoint(x,y);
+                
+                mouseStroke.X = point.X;
+                mouseStroke.Y = point.Y;
 
                 stroke.Mouse = mouseStroke;
                 stroke.Mouse.Flags = MouseFlags.MoveAbsolute;
 
                 InterceptionDriver.Send(context, 12, ref stroke, 1);
             }
+            else
             {
                 Cursor.Position = new Point(x, y);
             }
+        }
+        
+        /// <summary>
+        /// Change Screen location to Device location
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        private static Point ConvertDevicePoint(int x,int y)
+        {
+            int SH = Screen.PrimaryScreen.Bounds.Height;
+            int SW = Screen.PrimaryScreen.Bounds.Width;
+            return new Point(0xFFFF * x / SW, 0xFFFF * y / SH);
         }
     }
 }
